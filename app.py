@@ -1,19 +1,28 @@
 import plotly.express as px
 import streamlit as st
 import duckdb
-
+import datetime
 # Define a function to load the DataFrame from DuckDB
 @st.cache_data(ttl=3600)
-def load_data():
+
+def load_data(user_id, current_date):
+    # Generate a unique cache key based on user_id and current_date
+    cache_key = f"{user_id}_{current_date}"
+
     # Define the path to the Excel file
-    TOKENDB=st.secrets["TOKENDB"]
-    # Replace with your DuckDB token
+    TOKENDB = "your_token_here"  # Replace with your DuckDB token
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
     df = con.sql("SELECT * FROM aggregated_table").df()
     return df
 
-# Load the DataFrame using the caching function
-df = load_data()
+# Get the current date
+current_date = datetime.date.today()
+
+# Get the user ID (you can replace this with your user authentication logic)
+user_id = st.session_state.user_id
+
+# Load the DataFrame using the caching function with a custom cache key
+df = load_data(user_id, current_date)
 
 # Create a Streamlit sidebar for filters
 st.sidebar.header('Filters')
