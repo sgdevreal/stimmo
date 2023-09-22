@@ -3,7 +3,7 @@ import streamlit as st
 import duckdb
 
 # Define a function to load the DataFrame from DuckDB
-@st.cache_data(ttl=36000)
+@st.cache_data(ttl=3600)
 def load_data():
     # Define the path to the Excel file
     TOKENDB=st.secrets["TOKENDB"]
