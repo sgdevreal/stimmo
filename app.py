@@ -5,9 +5,9 @@ import datetime
 # Define a function to load the DataFrame from DuckDB
 @st.cache_data(ttl=3600)
 
-def load_data(user_id, current_date):
+def load_data(current_date):
     # Generate a unique cache key based on user_id and current_date
-    cache_key = f"{user_id}_{current_date}"
+    cache_key = f"{current_date}"
 
     # Define the path to the Excel file
     TOKENDB = "your_token_here"  # Replace with your DuckDB token
@@ -18,11 +18,8 @@ def load_data(user_id, current_date):
 # Get the current date
 current_date = datetime.date.today()
 
-# Get the user ID (you can replace this with your user authentication logic)
-user_id = st.session_state.user_id
-
 # Load the DataFrame using the caching function with a custom cache key
-df = load_data(user_id, current_date)
+df = load_data(current_date)
 
 # Create a Streamlit sidebar for filters
 st.sidebar.header('Filters')
