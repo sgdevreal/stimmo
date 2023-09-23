@@ -10,7 +10,7 @@ def load_data(current_date):
     cache_key = f"{current_date}"
 
     # Define the path to the Excel file
-    TOKENDB = "your_token_here"  # Replace with your DuckDB token
+    TOKENDB=st.secrets["TOKENDB"]
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
     df = con.sql("SELECT * FROM aggregated_table").df()
     return df
