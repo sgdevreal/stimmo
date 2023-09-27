@@ -2,23 +2,45 @@ import plotly.express as px
 import streamlit as st
 import duckdb
 import datetime
-import os
+import pandas as pd
+
+#get key 
+TOKENDB=st.secrets["TOKENDB"] 
+#settigns 
+# st.set_page_config(layout="wide")
+
 # Define a function to load the DataFrame from DuckDB
 @st.cache_data(ttl=3600)
-
 def load_data(current_date):
     # Generate a unique cache key based on user_id and current_date
     cache_key = f"{current_date}"
 
-    # Define the path to the Excel file
-    try:
-        TOKENDB=st.secrets["TOKENDB"] 
-    except:
-        TOKENDB ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uIjoic2ltb25nZXJpbi5kZXYuZ21haWwuY29tIiwiZW1haWwiOiJzaW1vbmdlcmluLmRldkBnbWFpbC5jb20iLCJ1c2VySWQiOiI5Mzg3ODFhMy1hNTM3LTQyMTctOTJhMy05MDQ2ODY3YmFiOWUiLCJpYXQiOjE2OTU1NjQzMTcsImV4cCI6MTcyNzEyMTkxN30.yNH5E0xlsNiadOLv--UceuTezpnjkd626FVsGoHZbBQ"
-    
-
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
     df = con.sql("SELECT * FROM aggregated_table").df()
+    return df
+@st.cache_data(ttl=3600)
+def load_full_data(property_type_filters, bedroom_count_filters, postal_code_filters, filter_dates_from_june_24):
+    # Generate a unique cache key based on user_id and current_date
+    cache_key = f"{current_date}"
+    con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
+    
+    # Build the SQL query with filters
+    query = """SELECT id,"property.type","property.bedroomCount","property.netHabitableSurface","price.mainValue","extractDate" FROM fulldata WHERE 1 = 1"""
+    
+    if property_type_filters:
+        query += f""" AND "property.type" IN {tuple(property_type_filters)}"""
+    
+    if bedroom_count_filters:
+        query += f""" AND "property.bedroomCount" IN {tuple(bedroom_count_filters)}"""
+    
+    if postal_code_filters:
+        query += f""" AND "property.location.postalCode" IN {tuple(postal_code_filters)}"""
+    
+    if filter_dates_from_june_24:
+        query += """ AND "extractDate" >= '2023-06-24'"""
+    query += """ order by extractDate desc LIMIT 100"""
+    df = con.sql(query).df()
+    
     return df
 
 # Get the current date
@@ -68,8 +90,21 @@ fig = px.line(
     x='extractDate',
     y='avg',
     color='sorting_column',  # Split lines based on the sorting column
-    labels={'sum_value': 'Main Value'},
+    labels={'sum_value': 'Main Value','count_id':'Number of properties'},
     title='Main Value Over Time',
+    hover_data = ["count_id"]
 )
 
 st.plotly_chart(fig)
+
+# Display the first 20 rows of the filtered DataFrame
+st.header('Filtered Data from full datase ')
+# Create a "Refresh" button above the DataFrame
+other_filtered_df = pd.DataFrame(columns=['url','type','bedrooms','surface','price','date seen'])
+
+if st.button('Refresh Data'):
+    other_filtered_df = load_full_data(property_type_filters, bedroom_count_filters, postal_code_filters, filter_dates_from_june_24)
+    other_filtered_df.columns = ['url','type','bedrooms','surface','price','date seen']
+    other_filtered_df['url'] = "https://www.immoweb.be/fr/annonce/" + other_filtered_df['url'].astype(str)
+
+st.dataframe(other_filtered_df.head(20),use_container_width=True,hide_index = True ,column_config={"url": st.column_config.LinkColumn("URL to website",width='small')},)
