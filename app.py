@@ -2,6 +2,7 @@ import plotly.express as px
 import streamlit as st
 import duckdb
 import datetime
+import os
 # Define a function to load the DataFrame from DuckDB
 @st.cache_data(ttl=3600)
 
@@ -10,7 +11,12 @@ def load_data(current_date):
     cache_key = f"{current_date}"
 
     # Define the path to the Excel file
-    TOKENDB=st.secrets["TOKENDB"]
+    try:
+        TOKENDB=st.secrets["TOKENDB"] 
+    except:
+        TOKENDB ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uIjoic2ltb25nZXJpbi5kZXYuZ21haWwuY29tIiwiZW1haWwiOiJzaW1vbmdlcmluLmRldkBnbWFpbC5jb20iLCJ1c2VySWQiOiI5Mzg3ODFhMy1hNTM3LTQyMTctOTJhMy05MDQ2ODY3YmFiOWUiLCJpYXQiOjE2OTU1NjQzMTcsImV4cCI6MTcyNzEyMTkxN30.yNH5E0xlsNiadOLv--UceuTezpnjkd626FVsGoHZbBQ"
+    
+
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
     df = con.sql("SELECT * FROM aggregated_table").df()
     return df
