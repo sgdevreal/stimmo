@@ -8,7 +8,7 @@ click==8.1.7
 colorama==0.4.6
 contourpy==1.1.1
 cycler==0.11.0
-duckdb==0.8.1
+duckdb==0.9.1
 et-xmlfile==1.1.0
 fonttools==4.42.1
 gitdb==4.0.10
