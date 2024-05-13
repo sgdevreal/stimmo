@@ -108,5 +108,7 @@ def main():
         st.header("Placeholder")
         st.plotly_chart(fig2, use_container_width=True)
         
+    return
+        
 if __name__ == '__main__':
     main()
