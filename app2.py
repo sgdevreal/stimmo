@@ -92,22 +92,22 @@ def main():
     with col1:
         st.header("Number of housing offers")
         st.plotly_chart(fig1, use_container_width=True)
-    with col2:
-        st.header("Average asking price of housing offers")
-        st.plotly_chart(fig2, use_container_width=True)
-    with col3:
-        st.header("Placeholder")
-        st.plotly_chart(fig1, use_container_width=True)
-    with col4:
-        st.header("Placeholder")
-        st.plotly_chart(fig2, use_container_width=True)
-    with col5:
-        st.header("Placeholder")
-        st.plotly_chart(fig2, use_container_width=True)
-    with col6:
-        st.header("Placeholder")
-        st.plotly_chart(fig2, use_container_width=True)
-        
+    # with col2:
+    #     st.header("Average asking price of housing offers")
+    #     st.plotly_chart(fig2, use_container_width=True)
+    # with col3:
+    #     st.header("Placeholder")
+    #     st.plotly_chart(fig1, use_container_width=True)
+    # with col4:
+    #     st.header("Placeholder")
+    #     st.plotly_chart(fig2, use_container_width=True)
+    # with col5:
+    #     st.header("Placeholder")
+    #     st.plotly_chart(fig2, use_container_width=True)
+    # with col6:
+    #     st.header("Placeholder")
+    #     st.plotly_chart(fig2, use_container_width=True)
+
     return
         
 if __name__ == '__main__':
