@@ -16,8 +16,9 @@ def load_data(current_date):
     cache_key = f"{current_date}"
 
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
-    df = con.sql("SELECT * FROM aggregated_table").df()
+    df = con.sql("SELECT * FROM housing_fact_table").df()
     return df
+
 @st.cache_data(ttl=3600)
 def load_full_data(property_type_filters, bedroom_count_filters, postal_code_filters, filter_dates_from_june_24):
     # Generate a unique cache key based on user_id and current_date

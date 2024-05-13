@@ -1,0 +1,10 @@
+/* styles.css */
+@media only screen and (max-width: 600px) {
+    .row-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .st-plotly_chart {
+        width: 100% !important;
+    }
+}

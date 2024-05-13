@@ -1,4 +1,4 @@
 /env/
-
+.env
 secrets.toml
 .streamlit/secrets.toml
