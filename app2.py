@@ -12,7 +12,62 @@ def load_data(current_date):
     cache_key = f"{current_date}"
     TOKENDB=st.secrets["TOKENDB"]
     con = duckdb.connect(f'md:aggregated?motherduck_token={TOKENDB}')
-    df = con.sql("SELECT * FROM V2aggregated_table").df()
+    df = con.sql("""
+                 SELECT
+                "property.location.country",
+                "property.location.region",
+                "property.location.province",
+                "property.location.district",
+                "property.location.locality",
+                "property.location.postalCode",
+                "property.type",
+                extractDate,
+                extractYear,
+                extractMonth,
+                extractDay,
+                netHabitableSurface_bin,
+                sum(num_properties) as num_properties,
+                --sum_net_habitable_surface,
+                --avg_net_habitable_surface,
+                --sum_room_count,
+                --avg_room_count,
+                sum(sum_price) as sum_price,
+                -- avg_price,
+                -- max_price,
+                -- min_price,
+                -- max_land_surface,
+                --low_percentile,
+                --high_percentile,
+                --price_flag_low,
+                --price_flag_high
+                 FROM
+                 V2aggregated_table
+                 group by
+                "property.location.country",
+                "property.location.region",
+                "property.location.province",
+                "property.location.district",
+                "property.location.locality",
+                "property.location.postalCode",
+                "property.type",
+                extractDate,
+                extractYear,
+                extractMonth,
+                extractDay,
+                netHabitableSurface_bin,
+                --sum_net_habitable_surface,
+                --avg_net_habitable_surface,
+                --sum_room_count,
+                --avg_room_count,
+                -- avg_price,
+                -- max_price,
+                -- min_price,
+                -- max_land_surface,
+                --low_percentile,
+                --high_percentile,
+                --price_flag_low,
+                --price_flag_high
+                 """).df()
     return df
 
 def main():
@@ -62,6 +117,9 @@ def main():
     grouped = df.groupby(['extractDate']).agg({'sum_price': 'sum', 'num_properties': 'sum'})
     grouped['avg'] = grouped['sum_price'] / grouped['num_properties']
 
+    grouped2 = df.groupby(['extractDate','property.location.postalCode']).agg({'sum_price': 'sum', 'num_properties': 'sum'})
+    grouped2['avg'] = grouped['sum_price'] / grouped['num_properties']
+
     fig1 = px.line(
         grouped.reset_index(),  # Reset the index to use 'extractDate' and 'sorting_column' as separate columns
         x='extractDate',
@@ -75,6 +133,23 @@ def main():
         y='avg',
         labels={'sum_price': 'Main Value','avg_price':'Average price of properties'},
         title='AVG Main Value Over Time'        
+    )
+
+    fig3 = px.line(
+        grouped2.reset_index(),  # Reset the index to use 'extractDate' and 'sorting_column' as separate columns
+        x='extractDate',
+        y='num_properties',
+        labels={'sum_price': 'Main Value','num_properties':'Number of properties'},
+        title='Number of properties Over Time' ,
+        color='property.location.postalCode'       
+    )
+    fig4 = px.line(
+        grouped2.reset_index(),  # Reset the index to use 'extractDate' and 'sorting_column' as separate columns
+        x='extractDate',
+        y='avg',
+        labels={'sum_price': 'Main Value','avg_price':'Average price of properties'},
+        title='AVG Main Value Over Time',        
+        color='property.location.postalCode'
     )
 
 
@@ -92,18 +167,18 @@ def main():
     with col1:
         st.header("Number of housing offers")
         st.plotly_chart(fig1, use_container_width=True)
-    # with col2:
-    #     st.header("Average asking price of housing offers")
-    #     st.plotly_chart(fig2, use_container_width=True)
+    with col2:
+        st.header("Average asking price")
+        st.plotly_chart(fig2, use_container_width=True)
     # with col3:
     #     st.header("Placeholder")
     #     st.plotly_chart(fig1, use_container_width=True)
-    # with col4:
-    #     st.header("Placeholder")
-    #     st.plotly_chart(fig2, use_container_width=True)
-    # with col5:
-    #     st.header("Placeholder")
-    #     st.plotly_chart(fig2, use_container_width=True)
+    with col4:
+        st.header("Placeholder")
+        st.plotly_chart(fig3, use_container_width=True)
+    with col5:
+        st.header("Placeholder")
+        st.plotly_chart(fig4, use_container_width=True)
     # with col6:
     #     st.header("Placeholder")
     #     st.plotly_chart(fig2, use_container_width=True)
